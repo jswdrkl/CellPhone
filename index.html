@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="mr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>मी, तुम्ही, आपण सगळे फोन का ‘बघतो’?</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Devanagari:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"IBM Plex Sans Devanagari"', '"IBM Plex Sans"', 'sans-serif'],
+          },
+          colors: {
+            cream: {
+              50: '#fbf9f5',
+              100: '#f7f3ec',
+              200: '#efe6d8',
+            },
+            night: {
+              900: '#121316',
+              800: '#1b1d22',
+              700: '#252830',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'IBM Plex Sans Devanagari', 'IBM Plex Sans', sans-serif;
+      word-break: keep-all;
+      overflow-wrap: normal;
+      hyphens: none;
+      -webkit-hyphens: none;
+      -ms-hyphens: none;
+    }
+
+    .essay-body {
+      text-align: justify;
+      text-justify: inter-word;
+      line-height: 2.05;
+      font-size: 1.14rem;
+    }
+
+    @media (max-width: 640px) {
+      .essay-body {
+        font-size: 1.05rem;
+        line-height: 1.95;
+      }
+    }
+
+    /* Floating and pulse animations for the title SVG */
+    @keyframes subtleFloat {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-8px) rotate(1deg);
+      }
+    }
+
+    @keyframes pulseAura {
+      0%, 100% {
+        opacity: 0.45;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.85;
+        transform: scale(1.08);
+      }
+    }
+
+    @keyframes rippleWave {
+      0% {
+        r: 18;
+        opacity: 0.8;
+      }
+      100% {
+        r: 48;
+        opacity: 0;
+      }
+    }
+
+    .float-phone {
+      animation: subtleFloat 5s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    .aura-circle {
+      animation: pulseAura 4s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    .ripple-ring-1 {
+      animation: rippleWave 3s ease-out infinite;
+    }
+
+    .ripple-ring-2 {
+      animation: rippleWave 3s ease-out infinite 1.5s;
+    }
+
+    /* Toast Notification Animation */
+    #toast {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-[#fbf9f5] dark:bg-night-900 text-stone-800 dark:text-stone-200 transition-colors duration-300 min-h-screen antialiased selection:bg-amber-200 dark:selection:bg-amber-800 selection:text-stone-900 dark:selection:text-stone-100 flex flex-col justify-between">
+
+  <div class="w-full max-w-3xl mx-auto px-6 pt-6 flex justify-end items-center gap-3">
+    <!-- Share Button -->
+    <button id="shareButton" type="button" aria-label="शेअर करा" class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-full bg-white/80 dark:bg-night-800/90 hover:bg-stone-100 dark:hover:bg-night-700 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700 shadow-sm transition-all duration-200 active:scale-95">
+      <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+      </svg>
+      <span>शेअर</span>
+    </button>
+
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle" type="button" aria-label="थीम बदला" class="p-2 rounded-full bg-white/80 dark:bg-night-800/90 hover:bg-stone-100 dark:hover:bg-night-700 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700 shadow-sm transition-all duration-200 active:scale-95">
+      <!-- Sun icon for dark mode toggle -->
+      <svg id="sunIcon" class="w-5 h-5 hidden text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      <!-- Moon icon for light mode toggle -->
+      <svg id="moonIcon" class="w-5 h-5 text-stone-600 dark:text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    </button>
+  </div>
+
+  <main class="w-full max-w-2xl mx-auto px-6 py-6 flex-1">
+    
+    <!-- Light, colorful animated SVG graphic depicting smartphone with consciousness & introspection -->
+    <div class="flex justify-center my-4">
+      <svg class="w-52 h-44 sm:w-60 sm:h-52 drop-shadow-md" viewBox="0 0 320 260" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="स्मार्टफोन आणि आत्मपरीक्षणाची संकल्पना">
+        <defs>
+          <linearGradient id="auroraGlow" x1="40" y1="20" x2="280" y2="240" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#fdba74" stop-opacity="0.75" />
+            <stop offset="50%" stop-color="#f472b6" stop-opacity="0.65" />
+            <stop offset="100%" stop-color="#818cf8" stop-opacity="0.8" />
+          </linearGradient>
+
+          <linearGradient id="phoneBody" x1="120" y1="50" x2="200" y2="220" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="50%" stop-color="#818cf8" />
+            <stop offset="100%" stop-color="#c084fc" />
+          </linearGradient>
+
+          <linearGradient id="screenGradLight" x1="125" y1="65" x2="195" y2="195" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+            <stop offset="100%" stop-color="#e0e7ff" stop-opacity="0.9" />
+          </linearGradient>
+
+          <radialGradient id="centerPulse" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fde047" stop-opacity="0.9" />
+            <stop offset="60%" stop-color="#f97316" stop-opacity="0.4" />
+            <stop offset="100%" stop-color="#ec4899" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+
+        <!-- Ambient Radiance Aura -->
+        <circle class="aura-circle" cx="160" cy="130" r="100" fill="url(#auroraGlow)" filter="blur(30px)" />
+
+        <!-- Concentric Waves of Thought / Introspection -->
+        <circle class="ripple-ring-1" cx="160" cy="130" r="20" stroke="#fb923c" stroke-width="2" fill="none" opacity="0.6" />
+        <circle class="ripple-ring-2" cx="160" cy="130" r="20" stroke="#818cf8" stroke-width="2" fill="none" opacity="0.6" />
+
+        <!-- Floating Smartphone Frame -->
+        <g class="float-phone">
+          <!-- Device Shadow -->
+          <rect x="117" y="57" width="86" height="154" rx="20" fill="#0f172a" opacity="0.12" />
+
+          <!-- Outer Device Border -->
+          <rect x="114" y="50" width="92" height="160" rx="22" fill="url(#phoneBody)" stroke="#ffffff" stroke-width="2.5" />
+
+          <!-- Screen Display -->
+          <rect x="121" y="60" width="78" height="140" rx="16" fill="url(#screenGradLight)" />
+
+          <!-- Speaker Notch & Camera Dot -->
+          <rect x="146" y="65" width="28" height="4" rx="2" fill="#94a3b8" />
+          <circle cx="140" cy="67" r="1.8" fill="#94a3b8" />
+
+          <!-- Inner Screen: Radiant Heart / Mind Blossom representing introspective consciousness -->
+          <circle cx="160" cy="125" r="28" fill="url(#centerPulse)" />
+
+          <!-- Dynamic curiosity particles -->
+          <path d="M152 115 C154 110, 166 110, 168 115 C170 120, 160 133, 160 135 C160 133, 150 120, 152 115 Z" fill="#ec4899" opacity="0.85" />
+          <circle cx="160" cy="148" r="2.5" fill="#f59e0b" />
+
+          <!-- Subtle App Bar Lines on Screen -->
+          <line x1="135" y1="168" x2="185" y2="168" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" />
+          <line x1="145" y1="176" x2="175" y2="176" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round" />
+
+          <!-- Home indicator bar -->
+          <line x1="148" y1="193" x2="172" y2="193" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" />
+        </g>
+
+        <!-- Floating Sparkles representing Ideas & Creativity -->
+        <g opacity="0.9">
+          <!-- Sparkle Top-Right -->
+          <path d="M232 75 L235 84 L244 87 L235 90 L232 99 L229 90 L220 87 L229 84 Z" fill="#f59e0b" />
+          <!-- Sparkle Left -->
+          <path d="M85 110 L87 117 L94 119 L87 121 L85 128 L83 121 L76 119 L83 117 Z" fill="#06b6d4" />
+          <!-- Sparkle Bottom-Right -->
+          <path d="M238 160 L240 166 L246 168 L240 170 L238 176 L236 170 L230 168 L236 166 Z" fill="#ec4899" />
+          <!-- Soft ambient dots -->
+          <circle cx="95" cy="80" r="3.5" fill="#f43f5e" opacity="0.65" />
+          <circle cx="225" cy="130" r="2.5" fill="#3b82f6" opacity="0.65" />
+          <circle cx="102" cy="170" r="3" fill="#10b981" opacity="0.65" />
+        </g>
+      </svg>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-semibold text-center tracking-normal text-stone-900 dark:text-stone-50 mt-2 mb-8 leading-snug">
+      मी, तुम्ही, आपण सगळे फोन का ‘बघतो’?
+    </h1>
+
+    <div class="space-y-6 text-stone-700 dark:text-stone-300">
+      
+      <p class="essay-body font-normal">
+        खरंच, गेल्या १०-१५ वर्षांत लहान-थोर सगळ्यांचाच सखा-सोबती झालेला स्मार्टफोन आपण सारखा सारखा का पाहतो?
+      </p>
+
+      <p class="essay-body font-normal">
+        हा प्रश्न कोणालाही विचारला तर बहुदा पुढील उत्तरे मिळण्याची शक्यता आहे –
+      </p>
+
+      <!-- Responses / Introspective questions -->
+      <div class="space-y-3 pl-3 sm:pl-5 border-l-2 border-amber-300 dark:border-amber-600/70 my-4 text-stone-800 dark:text-stone-200">
+        <p class="essay-body font-medium italic text-stone-800 dark:text-stone-200">
+          ‘मला’ काही संदेश आलाय का?
+        </p>
+        <p class="essay-body font-medium italic text-stone-800 dark:text-stone-200">
+          कोणी काही इंटरेस्टिंग स्टोरी किंवा रील ‘पोष्टले’ आहे का?
+        </p>
+        <p class="essay-body font-medium italic text-stone-800 dark:text-stone-200">
+          शेजारच्या गल्लीत किंवा ब्रह्मांडाच्या सुदूर कोपऱ्यात काही घडलेले तर नाही ना की जे ‘मला’ कळलेले नाही?
+        </p>
+      </div>
+
+      <p class="essay-body font-normal">
+        ही कारणे सांगणे किंवा मान्य करणे म्हणजे आपण आपलेच समाधान करून घेणे आहे. कारण; कारण या सतत फोन पाहण्यासाठी उतावीळ असण्यामागे जी खरी कारणे आहेत ती आपली आपल्यालाच न-आवडणारी आहेत. अगदी प्रामाणिकपणे पहिले तर जेव्हां आपल्या मनात एखादी चिंता असते, एखादा निर्णय घेण्याबद्दल द्विधा मनस्थिती झालेली असते, हातून झालेली एखादी चूक सतावत असते हे आणि यासारखे नकारात्मक विचार भंडावून सोडत असतात, त्यावर काय करायला हवे याचा विचार करणे नकोसे झालेले असते, म्हणजे थोडक्यात जेव्हां आपल्याला आपल्याच भावना हाताळता येत नाहीत तेव्हां तो सतत हाताशी असलेला फोन उचलून त्याच्या स्क्रीनमधे डोके घालणे ही एक अक्षरशः सोपी पळवाट असते!
+      </p>
+
+      <p class="essay-body font-normal">
+        आपण स्वतः विचार करण्याऐवजी यंत्राचा विचार ऐकतो, त्याचा वापर करून आपल्या आत्मनिरीक्षण करण्याच्या दृष्टीवर काळा चष्मा चढवतो आणि आपलीच वैचारिक क्षमता झाकून टाकतो.
+      </p>
+
+      <p class="essay-body font-normal">
+        या भूतलावरील सर्वात हुशार प्राण्याच्या बुद्धिमत्तेचे काय हे विडंबन, की त्याने अशा एका उपकरणाचा शोध लावला ज्याच्या वापराने प्रत्यक्षात तो स्वतःलाच भेटू शकत नाहीये पण तरीही त्या फोनला तो संपर्काचे अत्युच्च साधन म्हणतो.
+      </p>
+
+      <p class="essay-body font-normal">
+        या ‘कम्युनिकेशन’ क्रांती मुळे वेळ कसा वाचतो, फोन हाती असला की शब्दकोष, नकाशे कसे ‘पहावे’ लागत नाहीत आणि माहितीचा खजिना कसा हाती आलाय या आणि यासारख्या त्या फोनच्या क्षमतांबद्दल आपल्याला किती ते ‘कौतुक’.
+      </p>
+
+      <p class="essay-body font-normal">
+        पण या ‘शोधा’च्या आहारी जाण्यामुळे आपण क्वचितप्रसंगी खरंच काहीही न करण्यातली, दिवास्वप्ने बघण्यातली, उनाडक्या करण्यातली ‘मौज’, अचानक सुचणाऱ्या ‘आयडियाच्या-कल्पनेत’ला, त्या प्रत्यक्षात आणण्याच्या प्रयनांतला थरार, मनातल्या गोष्टी कागदावर मांडणे, चित्र रंगवणे विसरलो आहोत, स्वसंवाद हरवून बसलो आहोत हे आपल्या ध्यानातच येत नाहीये.
+      </p>
+
+      <p class="essay-body font-normal">
+        अजूनही वेळ गेलेली नाहीये. उपाय आपल्याच ‘हातात’ आहे.
+      </p>
+
+      <p class="essay-body font-normal">
+        यापुढे जेव्हां जेव्हां तो फोन उचलून त्यात डोळे घालण्याची प्रबळ उर्मी येईल त्या वेळी सजगपणे स्वतःला विचारायचे - ‘आता या क्षणी जर हा फोन हाताशी नसता, तर मी काय केले असते?
+      </p>
+
+      <p class="essay-body font-normal">
+        या अत्यंत साध्या प्रश्नाचे प्रामाणिक उत्तर कदाचित एका वेगळ्याच वाटेवर घेऊन जाईल, आपल्याच आतल्या पण न-रुळलेल्या वाटेवर. पडलेल्या प्रश्नांची उत्तरे फोनमध्ये न शोधण्याची सवय विचारशक्तीला चालना देईल; आत्मनिरीक्षणाची कवाडे किलकिली करेल. या सताड खुल्या झालेल्या खिडक्या (मायक्रोसॉफ्टच्या विंडोज नव्हेत) मग आपल्याला काय सोडायला हवे, कुठे पाय रोवून उभे राहायला हवे आणि काय करून पाहायला हवे याचे मार्ग दाखवतील!
+      </p>
+
+      <p class="essay-body font-normal">
+        ज्या वेळेस ‘गूगल’ करावेसे वाटेल त्या वेळेस जाणीवपूर्वक दुसरीकडे नजर वळवून स्वतःला विचारायला हवे – मला नक्की काय करायचे आहे? मी कशावर लक्ष द्यायला हवे? मला कोणती चिंता सतावते आहे का; कसला राग आला आहे का? आणि या सर्व प्रश्नांच्या उत्तरार्थ मी स्वतःला काय सांगायला हवे?
+      </p>
+
+      <p class="essay-body font-normal">
+        प्रश्नांच्या चेंडूंवर द्यायच्या उत्तरांच्या बॅटी आपल्याच ‘आत’ आहेत. त्या वापरुन चौकार-षटकार मारत प्रत्यक्ष कृतींची आतषबाजी करणे हे बाहेरचे ‘गुगली’ तटवत वेळ वाया घालवण्यापेक्षा खचितच आनंददायक आहे, नाही का?
+      </p>
+
+      <div class="pt-8 pb-10 space-y-2 border-t border-stone-200/80 dark:border-stone-800 mt-10">
+        <p class="text-sm md:text-base font-normal text-stone-600 dark:text-stone-400">
+          २१ सप्टेंबर २०२४
+        </p>
+        <p class="text-sm md:text-base font-normal text-stone-600 dark:text-stone-400">
+          संदर्भ - www.theschooloflife.com पॉडकास्ट “When and Why do we Pick Up our Phones?”
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-full bg-stone-900/90 dark:bg-stone-100/90 text-white dark:text-stone-900 text-sm shadow-xl backdrop-blur-sm pointer-events-none opacity-0 translate-y-3 z-50 flex items-center gap-2">
+    <svg class="w-4 h-4 text-emerald-400 dark:text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="toastMessage">लिंक कॉपी झाली!</span>
+  </div>
+
+  <script>
+    // Theme toggle handling
+    const htmlEl = document.documentElement;
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+      } else {
+        htmlEl.classList.remove('dark');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+      }
+    }
+
+    // Default or stored preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const storedTheme = localStorage.getItem('theme');
+    const initialDark = storedTheme ? storedTheme === 'dark' : prefersDark;
+    applyTheme(initialDark);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const isCurrentlyDark = htmlEl.classList.contains('dark');
+      const newDark = !isCurrentlyDark;
+      applyTheme(newDark);
+      localStorage.setItem('theme', newDark ? 'dark' : 'light');
+    });
+
+    // Share & Clipboard handling
+    const shareButton = document.getElementById('shareButton');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    let toastTimeout = null;
+
+    function showToast(msg) {
+      toastMessage.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-3');
+      }, 2600);
+    }
+
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('लिंक क्लिपबोर्डवर कॉपी झाली!');
+      } catch (err) {
+        showToast('कृपया URL स्वतः कॉपी करा');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    shareButton.addEventListener('click', () => {
+      const pageTitle = document.title;
+      const pageUrl = window.location.href;
+
+      if (navigator.share) {
+        navigator.share({
+          title: pageTitle,
+          text: 'मी, तुम्ही, आपण सगळे फोन का ‘बघतो’?',
+          url: pageUrl
+        }).catch((err) => {
+          if (err.name !== 'AbortError') {
+            copyToClipboard(pageUrl);
+          }
+        });
+      } else {
+        copyToClipboard(pageUrl);
+      }
+    });
+  </script>
+</body>
+</html>
